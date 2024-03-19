@@ -10,22 +10,32 @@ Globals:
     Timeout: 10
     
 Resources:
-  FlaskFunction2:
+  CreateFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: app.lambda_handler
+      Handler: app.create_case
       Runtime: python3.9
       Events:
          ApiEvent:
            Type: HttpApi
-           
+           Properties:
+            Path: /create
+            Method: POST
+
+  GetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.get_case
+      Runtime: python3.9
+      Events:
+         ApiEvent:
+           Type: HttpApi
+           Properties:
+            Path: /case/{case_id}
+            Method: GET
+
 Outputs:
-  FlaskApi:
-    Description: "API Gateway endpoint URL for Prod stage for Flask function"
+  Endpoint:
+    Description: "API Gateway endpoint URL for Prod stage for the endpoint"
     Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/"
-  FlaskFunction:
-    Description: "Flask Lambda Function ARN"
-    Value: !GetAtt FlaskFunction2.Arn
-  FlaskIamRole:
-    Description: "Implicit IAM Role created for Flask function"
-    Value: !GetAtt FlaskFunction2Role.Arn
+

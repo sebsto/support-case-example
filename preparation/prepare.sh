@@ -14,7 +14,7 @@ aws dynamodb create-table \
     --region $AWS_REGION 
 
 echo "waiting a few seconds for the table to be available"
-sleep 10 
+aws dynamodb wait table-exists --table-name $TABLE_NAME
 
 aws dynamodb put-item \
     --table-name $TABLE_NAME \

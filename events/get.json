@@ -1,0 +1,38 @@
+{
+	"body": "",
+	"cookies": [],
+	"headers": {
+		"Accept": "*/*",
+		"Host": "127.0.0.1:3000",
+		"User-Agent": "curl/8.4.0",
+		"X-Forwarded-Port": "3000",
+		"X-Forwarded-Proto": "http"
+	},
+	"isBase64Encoded": "false",
+	"pathParameters": {
+		"case_id": "1"
+	},
+	"rawPath": "/case/1",
+	"rawQueryString": "",
+	"requestContext": {
+		"accountId": "123456789012",
+		"apiId": "1234567890",
+		"domainName": "localhost",
+		"domainPrefix": "localhost",
+		"http": {
+			"method": "GET",
+			"path": "/case/1",
+			"protocol": "HTTP/1.1",
+			"sourceIp": "127.0.0.1",
+			"userAgent": "Custom User Agent String"
+		},
+		"requestId": "5f8d0f64-76ee-49ca-990d-b8aa49fa75e5",
+		"routeKey": "GET /case/{case_id}",
+		"stage": "$default",
+		"time": "19/Mar/2024:17:50:11 +0000",
+		"timeEpoch": 1710870611
+	},
+	"routeKey": "GET /case/{case_id}",
+	"stageVariables": "none",
+	"version": "2.0"
+}
