@@ -1,5 +1,5 @@
-test:
-	sam local start-api
+tests:
+	pytest tests
 
-deploy:
-	echo "todo"
+local:
+	sam local start-api

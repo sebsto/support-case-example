@@ -2,39 +2,64 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
   python3.9
-  Sample SAM Template for flask
+  SAM Template for CRUD API on DynamoDB
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Timeout: 10
-    
+    Architectures:
+      - arm64
+    Runtime: python3.12
+    Environment:
+      Variables:
+        DDB_TABLE_NAME: !Ref DynamoDBTable
+        DDB_AWS_REGION: !Ref AWS::Region
+
 Resources:
   CreateFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: app.create_case
-      Runtime: python3.9
       Events:
          ApiEvent:
            Type: HttpApi
            Properties:
-            Path: /create
+            Path: /case
             Method: POST
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DynamoDBTable
 
   GetFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: app.get_case
-      Runtime: python3.9
       Events:
          ApiEvent:
            Type: HttpApi
            Properties:
             Path: /case/{case_id}
             Method: GET
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DynamoDBTable
+
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      AttributeDefinitions: 
+        - AttributeName: caseid
+          AttributeType: S
+      KeySchema: 
+        - AttributeName: caseid
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
 
 Outputs:
+  DatabaseTableName:
+    Description: "DynamoDB Table Name"
+    Value: !Ref DynamoDBTable
   Endpoint:
     Description: "API Gateway endpoint URL for Prod stage for the endpoint"
     Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/"

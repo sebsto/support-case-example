@@ -1,31 +1,30 @@
-import os
-import boto3
-import uuid
 import json
-
-
-# Initialize DynamoDB client
-ddb_aws_region = os.getenv('DDB_AWS_REGION', "eu-central-1")
-ddb_table_name = os.getenv('DDB_TABLE_NAME', "support-cases")
-
-ddb = boto3.resource('dynamodb', region_name=ddb_aws_region)
-ddbtable = ddb.Table(ddb_table_name)
-
+import base64
+import api
 
 def create_case(event, context):
-    # print(event)
+    print(event)
     data = event['body']
 
-    if 'body' not in event or 'title' not in event['body'] or 'description' not in event['body']:
+    if 'body' not in event:
         return {
             'statusCode': 400,
             'body': json.dumps({'error': 'malformed request'}),
             'headers': {'Content-Type': 'application/json'}
         }
 
+    # decode the body from base64 to string 
+
+
     # Proceed with creating a case using the provided data
-    data = json.loads(event['body'])
+    try :
+        data = json.loads(event['body'])
+    except ValueError:        
+        # Maybe the payload is base64 encoded
+        print("Base64 decode the payload")
+        data = json.loads(base64.b64decode(event['body']))
     print(data)
+    
     if 'title' not in data or 'description' not in data:
         return {
             'statusCode': 400,
@@ -33,26 +32,26 @@ def create_case(event, context):
             'headers': {'Content-Type': 'application/json'}
         }
 
-    # Generate a unique case ID
-    caseid = str(uuid.uuid4())
-
-    # Put the new item into the DynamoDB table
-    ddbtable.put_item(Item={
-        'caseid': caseid,
-        'title': data['title'],
-        'description': data['description'],
-        'status': 'open'
-    })
+    # Create the case ID
+    try:
+        case_id = api.create_case(data['title'], data['description'])
+    except Exception as e:
+        print(e)
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': 'Internal server error'}),
+            'headers': {'Content-Type': 'application/json'}
+        }
 
     # Return a successful response
     return {
         "statusCode": 200,
-        "body": caseid
+        "body": case_id
     }
 
 def get_case(event, context):
+    print(event)
 
-    # print(event)
     # verify there is a path parameter
     if 'pathParameters' not in event or 'case_id' not in event['pathParameters']:
         return {
@@ -64,12 +63,20 @@ def get_case(event, context):
     case_id = event['pathParameters']['case_id']
 
     # Retrieve the item from the DynamoDB table
-    response = ddbtable.get_item(Key={'caseid': case_id})
+    try:
+        response = api.get_case(case_id)
+    except Exception as e:
+        print(e)
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': 'Internal server error'}),
+            'headers': {'Content-Type': 'application/json'}
+        }
 
     if 'Item' not in response:
         return {
             'statusCode': 404,
-            'body': json.dumps({'error': 'caseId not found'}),
+            'body': json.dumps(response),
             'headers': {'Content-Type': 'application/json'}
         }
 
