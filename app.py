@@ -13,9 +13,6 @@ def create_case(event, context):
             'headers': {'Content-Type': 'application/json'}
         }
 
-    # decode the body from base64 to string 
-
-
     # Proceed with creating a case using the provided data
     try :
         data = json.loads(event['body'])
@@ -73,7 +70,7 @@ def get_case(event, context):
             'headers': {'Content-Type': 'application/json'}
         }
 
-    if 'Item' not in response:
+    if 'error' in response:
         return {
             'statusCode': 404,
             'body': json.dumps(response),
@@ -81,4 +78,8 @@ def get_case(event, context):
         }
 
     # Return the item as a JSON object
-    return response['Item']
+    return {
+            'statusCode': 200,
+            'body': json.dumps(response),
+            'headers': {'Content-Type': 'application/json'}
+        }

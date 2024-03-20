@@ -1,9 +1,6 @@
 import os
-import boto3.dynamodb.conditions as ddb
-import boto3
 import uuid
-import json
-
+import boto3
 
 # Initialize DynamoDB client
 ddb_aws_region = os.getenv('DDB_AWS_REGION')
